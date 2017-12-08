@@ -1,6 +1,4 @@
 /**
- * Created by Josef Ginerman on 04/12/17.
- * ID : 332494830
  **/
 
 #ifndef TCPSERVER_SERVER_H
@@ -16,7 +14,12 @@ private:
     int port;
     int serverSocket; // the socket's file descriptor
     void handleClient(int clientSocket);
-    int calc(int arg1, const char op, int arg2) const;
+    void play(int clientSocketFirst, int clientSocketSecond);
+    int playOneTurn(int clientSocketFirst, int clientSocketSecond);
+    int sendColor(int clientSocket, char color);
+    bool hasError(int stat);
+    void handleClients();
+//    int calc(int arg1, const char op, int arg2) const;
 };
 
 #endif //TCPSERVER_SERVER_H

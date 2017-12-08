@@ -1,6 +1,4 @@
 /**
- * Created by Josef Ginerman on 04/12/17.
- * ID : 332494830
  **/
 
 #include "Server.h"
@@ -12,8 +10,16 @@
 
 using namespace std;
 #define MAX_CONNECTED_CLIENTS 10
+#define MOVE_SIZE 256
+#define ERROR -1
+#define NO_CONNECTION 0
+#define BLACK 'X'
+#define WHITE 'O'
+#define END_GAME "End"
 
-Server::Server(int port) : port(port), serverSocket(0) {
+Server::Server(int port)
+        : port(port),
+          serverSocket(0) {
     cout << "Server" << endl;
 }
 
@@ -25,86 +31,162 @@ void Server::start() {
     }
     // Assign a local address to the socket
     struct sockaddr_in serverAddress;
-    bzero((void *) &serverAddress,
-          sizeof(serverAddress));
+    bzero((void *) &serverAddress, sizeof(serverAddress));
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_addr.s_addr = INADDR_ANY;
     serverAddress.sin_port = htons(port);
-    if (bind(serverSocket, (struct sockaddr
-    *) &serverAddress, sizeof(serverAddress)) == -1) {
+    if (bind(serverSocket, (struct sockaddr *) &serverAddress,
+             sizeof(serverAddress)) == -1) {
         throw "Error on binding";
     }
+    while (true) {
+        this->handleClients();
+    }
+}
+
+void Server::handleClients() {
     // Start listening to incoming connections
     listen(serverSocket, MAX_CONNECTED_CLIENTS);
+
     // Define the client socket's structures
-    struct sockaddr_in clientAddress;
-    socklen_t clientAddressLen;
-    while (true) {
-        cout << "Waiting for client connections..." << endl;
-        // Accept a new client connection
-        int clientSocket = accept(serverSocket, (struct
-                sockaddr *) &clientAddress, &clientAddressLen);
-        cout << "Client connected" << endl;
-        if (clientSocket == -1)
-            throw "Error on accept";
-        handleClient(clientSocket);
-        // Close communication with the client
-        close(clientSocket);
+    struct sockaddr_in clientAddressFirst;
+    socklen_t clientAddressLenFirst = sizeof((struct sockaddr*) &clientAddressFirst);
+    struct sockaddr_in clientAddressSecond;
+    socklen_t clientAddressLenSecond = sizeof((struct sockaddr*) &clientAddressSecond);
+    cout << "Waiting for clients connections..." << endl;
+    // Accept a new client connection
+    int clientSocketFirst = accept(serverSocket,
+                                   (struct sockaddr *) &clientAddressFirst,
+                                   &clientAddressLenFirst);
+    cout << "Client first connected" << endl;
+    if (clientSocketFirst == ERROR) {
+        throw "Error on accept first client";
+    }
+    int clientSocketSecond = accept(serverSocket,
+                                    (struct sockaddr *) &clientAddressSecond,
+                                    &clientAddressLenSecond);
+    if (clientSocketSecond == ERROR) {
+        throw "Error on accept second client";
+    }
+    play(clientSocketFirst, clientSocketSecond);
+    // Close communication with the client
+    close(clientSocketFirst);
+    close(clientSocketSecond);
+}
+
+void Server::play(int clientSocketBlack, int clientSocketWhite) {
+    int stat;
+    stat = sendColor(clientSocketBlack, BLACK);
+    if (hasError(stat)) {
+        return;
+    }
+    stat = sendColor(clientSocketWhite, WHITE);
+    if (hasError(stat)) {
+        return;
+    }
+    bool shouldPlay = true;
+    bool blackPlayerTurn = true;
+    while (shouldPlay) {
+        if (blackPlayerTurn) {
+            stat = playOneTurn(clientSocketBlack, clientSocketWhite);
+            blackPlayerTurn = false;
+        } else {
+            stat = playOneTurn(clientSocketWhite, clientSocketBlack);
+            blackPlayerTurn = true;
+        }
+        if (stat <= 0) {
+            shouldPlay = false;
+        }
     }
 }
 
-void Server::handleClient(int clientSocket) {
-    int arg1, arg2;
-    char op;
-    while (true) {
-        // Read new exercise arguments
-        int n = read(clientSocket, &arg1, sizeof(arg1));
-        if (n == -1) {
-            cout << "Error reading arg1" << endl;
-            return;
-        }
-        if (n == 0) {
-            cout << "Client disconnected" << endl;
-            return;
-        }
-        n = read(clientSocket, &op, sizeof(op));
-        if (n == -1) {
-            cout << "Error reading operator" << endl;
-            return;
-        }
-        n = read(clientSocket, &arg2, sizeof(arg2));
-        if (n == -1) {
-            cout << "Error reading arg2" << endl;
-            return;
-        }
-        cout << "Got exercise: " << arg1 << op << arg2 <<
-             endl;
-        int result = calc(arg1, op, arg2);
-        // Write the result back to the client
-        n = write(clientSocket, &result, sizeof(result));
-        if (n == -1) {
-            cout << "Error writing to socket" << endl;
-            return;
-        }
+int Server::playOneTurn(int clientSocket1, int clientSocket2) {
+    char buf[MOVE_SIZE];
+    int stat;
+    stat = read(clientSocket1, buf, sizeof(char) * (MOVE_SIZE));
+    if (hasError(stat)) {
+        return stat;
     }
+    stat = write(clientSocket2, buf, sizeof(char) * (MOVE_SIZE));
+    if (hasError(stat)) {
+        return stat;
+    }
+    if (strcmp(buf, END_GAME) == 0) {
+        stat = -7;
+    }
+    return stat;
 }
 
-int Server::calc(int arg1, const char op, int arg2) const {
-    switch (op) {
-        case '+':
-            return arg1 + arg2;
-        case '-':
-            return arg1 - arg2;
-        case '*':
-            return arg1 * arg2;
-        case '/':
-            return arg1 / arg2;
-        default:
-            cout << "Invalid operator" << endl;
-            return 0;
+int Server::sendColor(int clientSocket, char color) {
+    char buf[MOVE_SIZE];
+    buf[0] = color;
+    int stat = write(clientSocket, buf, sizeof(char) * MOVE_SIZE);
+    return stat;
+}
+
+bool Server::hasError(int stat) {
+    if (stat == ERROR) {
+        cout << "Error sending to socket" << endl;
+        return true;
     }
+    if (stat == NO_CONNECTION) {
+        cout << "Error in connection" << endl;
+        return true;
+    }
+    return false;
 }
 
 void Server::stop() {
     close(serverSocket);
 }
+
+//int Server::calc(int arg1, const char op, int arg2) const {
+//    switch (op) {
+//        case '+':
+//            return arg1 + arg2;
+//        case '-':
+//            return arg1 - arg2;
+//        case '*':
+//            return arg1 * arg2;
+//        case '/':
+//            return arg1 / arg2;
+//        default:
+//            cout << "Invalid operator" << endl;
+//            return 0;
+//    }
+//}
+
+//void Server::handleClient(int clientSocket) {
+//    int arg1, arg2;
+//    char op;
+//    while (true) {
+//        // Read new exercise arguments
+//        int n = read(clientSocket, &arg1, sizeof(arg1));
+//        if (n == -1) {
+//            cout << "Error reading arg1" << endl;
+//            return;
+//        }
+//        if (n == 0) {
+//            cout << "Client disconnected" << endl;
+//            return;
+//        }
+//        n = read(clientSocket, &op, sizeof(op));
+//        if (n == -1) {
+//            cout << "Error reading operator" << endl;
+//            return;
+//        }
+//        n = read(clientSocket, &arg2, sizeof(arg2));
+//        if (n == -1) {
+//            cout << "Error reading arg2" << endl;
+//            return;
+//        }
+//        cout << "Got exercise: " << arg1 << op << arg2 << endl;
+//        int result = calc(arg1, op, arg2);
+//        // Write the result back to the client
+//        n = write(clientSocket, &result, sizeof(result));
+//        if (n == -1) {
+//            cout << "Error writing to socket" << endl;
+//            return;
+//        }
+//    }
+//}
