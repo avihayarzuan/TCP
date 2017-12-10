@@ -4,14 +4,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../TCP/ReadPort.cpp \
 ../TCP/Server.cpp \
 ../TCP/main.cpp 
 
 OBJS += \
+./TCP/ReadPort.o \
 ./TCP/Server.o \
 ./TCP/main.o 
 
 CPP_DEPS += \
+./TCP/ReadPort.d \
 ./TCP/Server.d \
 ./TCP/main.d 
 

@@ -5,5 +5,7 @@ set(CMAKE_CXX_STANDARD 98)
 
 set(SOURCE_FILES main.cpp
                 Server.cpp
-                Server.h)
+                Server.h
+                ReadPort.h
+                ReadPort.cpp)
 add_executable(TCPserver ${SOURCE_FILES})

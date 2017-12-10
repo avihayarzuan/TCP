@@ -7,7 +7,7 @@
 
 class Server {
 public:
-    Server(int port);
+    Server(const int port);
     void start();
     void stop();
 private:
@@ -19,7 +19,6 @@ private:
     int sendColor(int clientSocket, char color);
     bool hasError(int stat);
     void handleClients();
-//    int calc(int arg1, const char op, int arg2) const;
 };
 
 #endif //TCPSERVER_SERVER_H
