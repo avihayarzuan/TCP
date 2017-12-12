@@ -50,24 +50,27 @@ void Server::handleClients() {
 
     // Define the client socket's structures
     struct sockaddr_in clientAddressFirst;
-    socklen_t clientAddressLenFirst = sizeof((struct sockaddr*) &clientAddressFirst);
+    socklen_t clientAddressLenFirst =
+            sizeof((struct sockaddr*) &clientAddressFirst);
     struct sockaddr_in clientAddressSecond;
-    socklen_t clientAddressLenSecond = sizeof((struct sockaddr*) &clientAddressSecond);
+    socklen_t clientAddressLenSecond =
+            sizeof((struct sockaddr*) &clientAddressSecond);
     cout << "Waiting for clients connections..." << endl;
     // Accept a new client connection
     int clientSocketFirst = accept(serverSocket,
                                    (struct sockaddr *) &clientAddressFirst,
                                    &clientAddressLenFirst);
-    cout << "Client first connected" << endl;
     if (clientSocketFirst == ERROR) {
         throw "Error on accept first client";
     }
+    cout << "Client first connected" << endl;
     int clientSocketSecond = accept(serverSocket,
                                     (struct sockaddr *) &clientAddressSecond,
                                     &clientAddressLenSecond);
     if (clientSocketSecond == ERROR) {
         throw "Error on accept second client";
     }
+    cout << "Client second connected" << endl;
     play(clientSocketFirst, clientSocketSecond);
     // Close communication with the client
     close(clientSocketFirst);
@@ -80,10 +83,12 @@ void Server::play(int clientSocketBlack, int clientSocketWhite) {
     if (hasError(stat)) {
         return;
     }
+    cout << "sent black color" << endl;
     stat = sendColor(clientSocketWhite, WHITE);
     if (hasError(stat)) {
         return;
     }
+    cout << "sent white color" << endl;
     bool shouldPlay = true;
     bool blackPlayerTurn = true;
     while (shouldPlay) {
@@ -101,7 +106,7 @@ void Server::play(int clientSocketBlack, int clientSocketWhite) {
 }
 
 int Server::playOneTurn(int clientSocket1, int clientSocket2) {
-    char buf[MOVE_SIZE];
+    char buf[MOVE_SIZE] = {0};
     int stat;
     stat = read(clientSocket1, buf, sizeof(char) * (MOVE_SIZE));
     if (hasError(stat)) {

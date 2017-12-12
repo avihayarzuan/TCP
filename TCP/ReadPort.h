@@ -18,6 +18,11 @@ using namespace std;
  */
 class ReadPort {
  public:
+    /**
+     * using the file name it reads from it the port number
+     * @param path settings text file
+     * @return int of the port number
+     */
     static int getPort(char * path);
 };
 
