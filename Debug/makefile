@@ -44,7 +44,7 @@ all: TCP-server
 TCP-server: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	g++  -o "TCP-server" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -pthread -o "TCP-server" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

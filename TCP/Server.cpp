@@ -1,14 +1,7 @@
 /**
  **/
-
 #include "Server.h"
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <string.h>
-#include <iostream>
 
-using namespace std;
 #define MAX_CONNECTED_CLIENTS 10
 #define MOVE_SIZE 256
 #define ERROR -1
@@ -16,10 +9,18 @@ using namespace std;
 #define BLACK 'X'
 #define WHITE 'O'
 #define END_GAME "End"
+#define SERVER_EXIT "exit"
+
+//pthread_mutex_t m1;
+
+void * mainThread(void *s);
+void * listenToExit(void*s);
+void * getCommand(void *s);
 
 Server::Server(const int port)
         : port(port),
-          serverSocket(0) {
+          serverSocket(0),
+          shouldExit(false) {
     cout << "Server" << endl;
 }
 
@@ -39,10 +40,83 @@ void Server::start() {
              sizeof(serverAddress)) == -1) {
         throw "Error on binding";
     }
-    while (true) {
-        this->handleClients();
+    cout << "1" << endl;
+    pthread_t exitLoop;
+    int rc1 = pthread_create(&exitLoop, NULL, listenToExit, this);
+    if (rc1) {
+        cout << "Error: unable to create thread, " << rc1 << endl;
+        exit(-1);
     }
+    pthread_t maint;
+    cout << "2" << endl;
+    int rc = pthread_create(&maint, NULL, mainThread, this);
+    if (rc) {
+        cout << "Error: unable to create thread, " << rc << endl;
+        exit(-1);
+    }
+    cout << "3" << endl;
+    pthread_exit(NULL);
 }
+
+//    pthread_mutex_lock(&m1);
+//    pthread_mutex_unlock(&m1);
+//    while (true) {
+//        server->handleClients();
+//        cout << server->port;
+//    }
+void * listenToExit(void *s) {
+    Server * server = (Server *) s;
+    while (true) {
+        cout << "Type 'exit' to turn off the server" << endl;
+        string input = "";
+        string exitStr("exit");
+        getline(cin, input);
+        cout << input << endl;
+        if (input.compare(exitStr) == 0) {
+            cout << "Shutting down server" << endl;
+            server->shouldExit = true;
+            break;
+        }
+    }
+    return s;
+}
+
+void * mainThread(void *s) {
+    cout << "Server thread created" << endl;
+    Server *server = (Server*) s;
+    listen(server->serverSocket, MAX_CONNECTED_CLIENTS);
+    while (!server->shouldExit) {
+        struct sockaddr_in clientAddress;
+        socklen_t clientAddressLen = sizeof((struct sockaddr*) &clientAddress);
+        cout << "Waiting for clients connections..." << endl;
+        int clientSocket = accept(server->serverSocket,
+                                  (struct sockaddr *) &clientAddress,
+                                  &clientAddressLen);
+        if (clientSocket == ERROR) {
+            throw "Error on accept first client";
+        }
+        cout << "Client connected" << endl;
+        pthread_t commandThread;
+        int rc = pthread_create(&commandThread, NULL, getCommand, server);//and clientsocket
+        if (rc) {
+            cout << "Error: unable to create thread, " << rc << endl;
+            exit(-1);
+        }
+    }
+    return s;
+}
+
+void * getCommand(void *s) {
+
+    return s;
+}
+//    ClientHandler ch;
+//    pthread_t h;
+//    int rc = pthread_create(&h, NULL, &ClientHandler::handle, &ch);
+//    if (rc) {
+//        cout << "Error: unable to create thread, " << rc << endl;
+//        exit(-1);
+//    }
 
 void Server::handleClients() {
     // Start listening to incoming connections
@@ -106,7 +180,7 @@ void Server::play(int clientSocketBlack, int clientSocketWhite) {
 }
 
 int Server::playOneTurn(int clientSocket1, int clientSocket2) {
-    char buf[MOVE_SIZE] = {0};
+    char buf[MOVE_SIZE] = { 0 };
     int stat;
     stat = read(clientSocket1, buf, sizeof(char) * (MOVE_SIZE));
     if (hasError(stat)) {

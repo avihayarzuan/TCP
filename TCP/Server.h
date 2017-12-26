@@ -1,6 +1,19 @@
 /**
  **/
 
+
+#include "ClientHandler.h"
+#include <vector>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <string.h>
+#include <iostream>
+#include <cstdlib>
+
+using namespace std;
+
 #ifndef TCPSERVER_SERVER_H
 #define TCPSERVER_SERVER_H
 
@@ -22,11 +35,19 @@ public:
      * close the socket of the server
      */
     void stop();
-private:
+    /**
+     *using the socket the sever starts to listen and then
+     * start communicate with the players.
+     */
+    void handleClients();
+//private:
     // the port number for the server
     int port;
     // the socket's file descriptor
     int serverSocket;
+    ClientHandler clientHandler;
+    bool shouldExit;
+    vector <string> gameList;
     /**
      * using two different socket the server starts the game
      * @param clientSocketFirst
@@ -54,11 +75,7 @@ private:
      * @return true if there is an error, false otherwise
      */
     bool hasError(int stat);
-    /**
-     *using the socket the sever starts to listen and then
-     * start communicate with the players.
-     */
-    void handleClients();
+//    void *mainThread(void *arg);
 };
 
 #endif //TCPSERVER_SERVER_H
