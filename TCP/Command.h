@@ -5,10 +5,10 @@
  *      Author: avihay
  */
 
-#include <vector>
-#include <string>
 
 using namespace std;
+#include <vector>
+#include <string>
 #ifndef TCP_COMMAND_H_
 #define TCP_COMMAND_H_
 

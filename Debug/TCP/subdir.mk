@@ -4,27 +4,24 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../TCP/ClientHandler.cpp \
 ../TCP/CommandManager.cpp \
-../TCP/PrintCommand.cpp \
 ../TCP/ReadPort.cpp \
 ../TCP/Server.cpp \
+../TCP/StartCommand.cpp \
 ../TCP/main.cpp 
 
 OBJS += \
-./TCP/ClientHandler.o \
 ./TCP/CommandManager.o \
-./TCP/PrintCommand.o \
 ./TCP/ReadPort.o \
 ./TCP/Server.o \
+./TCP/StartCommand.o \
 ./TCP/main.o 
 
 CPP_DEPS += \
-./TCP/ClientHandler.d \
 ./TCP/CommandManager.d \
-./TCP/PrintCommand.d \
 ./TCP/ReadPort.d \
 ./TCP/Server.d \
+./TCP/StartCommand.d \
 ./TCP/main.d 
 
 

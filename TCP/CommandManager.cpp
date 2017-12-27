@@ -8,8 +8,7 @@
 #include "CommandManager.h"
 
 CommandManager::CommandManager() {
-//    commandsMap["print"] = new PrintCommand;
-
+    commandsMap["start"] = new StartCommand;
 }
 
 CommandManager::~CommandManager() {

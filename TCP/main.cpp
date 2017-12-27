@@ -16,3 +16,10 @@ int main() {
         exit(-1);
     }
 }
+
+//    char check[] = "start rrr rr ee";
+//    string c = server.getCommand(check);
+//    cout << c;
+//    vector<string> v = server.getCommandArgs(check);
+//    for (vector<string>::const_iterator i = v.begin(); i != v.end(); ++i)
+//        cout << *i << endl;

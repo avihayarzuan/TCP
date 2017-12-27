@@ -10,6 +10,7 @@
 #define WHITE 'O'
 #define END_GAME "End"
 #define SERVER_EXIT "exit"
+#define MESSAGE_SIZE 256
 
 //pthread_mutex_t m1;
 
@@ -17,11 +18,19 @@ void * mainThread(void *s);
 void * listenToExit(void*s);
 void * getCommand(void *s);
 
+struct ThreadArgs {
+    Server *server;
+    int socket;
+};
+
+string message(
+        "Enter one of the following commands to server:\nstart <name>\nlist_games\njoin <name>\n");
 Server::Server(const int port)
         : port(port),
           serverSocket(0),
           shouldExit(false) {
     cout << "Server" << endl;
+//    cout << message;
 }
 
 void Server::start() {
@@ -58,12 +67,6 @@ void Server::start() {
     pthread_exit(NULL);
 }
 
-//    pthread_mutex_lock(&m1);
-//    pthread_mutex_unlock(&m1);
-//    while (true) {
-//        server->handleClients();
-//        cout << server->port;
-//    }
 void * listenToExit(void *s) {
     Server * server = (Server *) s;
     while (true) {
@@ -97,7 +100,10 @@ void * mainThread(void *s) {
         }
         cout << "Client connected" << endl;
         pthread_t commandThread;
-        int rc = pthread_create(&commandThread, NULL, getCommand, server);//and clientsocket
+        ThreadArgs args;
+        args.server = server;
+        args.socket = clientSocket;
+        int rc = pthread_create(&commandThread, NULL, getCommand, &args);
         if (rc) {
             cout << "Error: unable to create thread, " << rc << endl;
             exit(-1);
@@ -107,22 +113,62 @@ void * mainThread(void *s) {
 }
 
 void * getCommand(void *s) {
-
-    return s;
-}
-//    ClientHandler ch;
-//    pthread_t h;
-//    int rc = pthread_create(&h, NULL, &ClientHandler::handle, &ch);
-//    if (rc) {
-//        cout << "Error: unable to create thread, " << rc << endl;
-//        exit(-1);
+    int stat;
+    ThreadArgs * args = (ThreadArgs*) s;
+    Server * server = args->server;
+    int socket = args->socket;
+    stat = server->askForCommand(socket);
+    if (server->hasError(stat)) {
+        return s;
+    }
+    char buf[] = "start 1 2 4 g d";
+//    char buf[MESSAGE_SIZE] = { 0 };
+//    stat = read(socket, buf, sizeof(char) * (MESSAGE_SIZE));
+//    if (server->hasError(stat)) {
+//        return s;
 //    }
 
+    server->manager.executeCommand(server->getCommand(buf), server->getCommandArgs(buf));
+    return s;
+}
+
+string Server::getCommand(char buf[]) {
+    string str(buf);
+    for (int i = 0; i < MESSAGE_SIZE; i++) {
+        if ((buf[i] == ' ') || (buf[i] == '\0')) {
+            string command = str.substr(0, i);
+            return command;
+        }
+    }
+    //should not get this line
+    return "error in message";
+}
+
+vector<string> Server::getCommandArgs(char buf[]) {
+    string str(buf);
+    vector<string> v;
+//    string args;
+    int i;
+    for (i = 0; i < MESSAGE_SIZE; i++) {
+        if (buf[i] ==  ' ') {
+            break;
+        }
+    }
+    char seperator = ' ';
+    string args = str.substr(i);
+    for (size_t p = 0, q = 0; p != args.npos; p = q) {
+        v.push_back(
+                args.substr(p + (p != 0),
+                            (q = args.find(seperator, p + 1)) - p - (p != 0)));
+    }
+    return v;
+}
+
 void Server::handleClients() {
-    // Start listening to incoming connections
+// Start listening to incoming connections
     listen(serverSocket, MAX_CONNECTED_CLIENTS);
 
-    // Define the client socket's structures
+// Define the client socket's structures
     struct sockaddr_in clientAddressFirst;
     socklen_t clientAddressLenFirst =
             sizeof((struct sockaddr*) &clientAddressFirst);
@@ -130,7 +176,7 @@ void Server::handleClients() {
     socklen_t clientAddressLenSecond =
             sizeof((struct sockaddr*) &clientAddressSecond);
     cout << "Waiting for clients connections..." << endl;
-    // Accept a new client connection
+// Accept a new client connection
     int clientSocketFirst = accept(serverSocket,
                                    (struct sockaddr *) &clientAddressFirst,
                                    &clientAddressLenFirst);
@@ -146,7 +192,7 @@ void Server::handleClients() {
     }
     cout << "Client second connected" << endl;
     play(clientSocketFirst, clientSocketSecond);
-    // Close communication with the client
+// Close communication with the client
     close(clientSocketFirst);
     close(clientSocketSecond);
 }
@@ -193,6 +239,14 @@ int Server::playOneTurn(int clientSocket1, int clientSocket2) {
     if (strcmp(buf, END_GAME) == 0) {
         stat = -7;
     }
+    return stat;
+}
+
+int Server::askForCommand(int clientSocket) {
+
+    char buf[] =
+            "Enter one of the following commands to server:\nstart <name>\nlist_games\njoin <name>\n";
+    int stat = write(clientSocket, buf, sizeof(char) * MESSAGE_SIZE);
     return stat;
 }
 

@@ -1,22 +1,28 @@
 /**
  **/
 
+#ifndef TCPSERVER_SERVER_H
+#define TCPSERVER_SERVER_H
 
-#include "ClientHandler.h"
-#include <vector>
+#include "CommandManager.h"
+#include <map>
 #include <pthread.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <string.h>
+#include <cstring>
 #include <iostream>
 #include <cstdlib>
+#include <vector>
 
 using namespace std;
 
-#ifndef TCPSERVER_SERVER_H
-#define TCPSERVER_SERVER_H
 
+//struct ThreadArgs {
+//    Server *server;
+//    int socket;
+//};
 
 class Server {
 public:
@@ -45,9 +51,18 @@ public:
     int port;
     // the socket's file descriptor
     int serverSocket;
-    ClientHandler clientHandler;
+
     bool shouldExit;
-    vector <string> gameList;
+
+    map <string, int> gameList;
+
+    CommandManager manager;
+
+    string getCommand(char buf[]);
+
+    vector<string> getCommandArgs(char buf[]);
+
+    int askForCommand(int client);
     /**
      * using two different socket the server starts the game
      * @param clientSocketFirst
@@ -75,7 +90,7 @@ public:
      * @return true if there is an error, false otherwise
      */
     bool hasError(int stat);
-//    void *mainThread(void *arg);
+
 };
 
 #endif //TCPSERVER_SERVER_H
