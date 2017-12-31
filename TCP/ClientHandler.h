@@ -26,6 +26,7 @@ struct ThreadArgs {
     map<string, int> * openGameList;
     vector <ActiveGames> * activeGameVec;
     CommandManager * manager;
+    bool * shouldClose;
     int socket;
 };
 

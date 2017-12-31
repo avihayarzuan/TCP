@@ -14,6 +14,7 @@ using namespace std;
 #include "StartCommand.h"
 #include "JoinCommand.h"
 #include "PlayCommand.h"
+#include "CloseCommand.h"
 
 class CommandManager {
  public:

@@ -15,8 +15,9 @@ void StartCommand::execute(vector<string> args, StructArgs *sa) {
             ++i) {
         cout << *i << endl;
     }
-
-    if (isExist(args.front(), sa) || sa->gameList->count(args.front())) {
+    if (isExist(args.front(), sa)) {
+        write(sa->socket, notValid, sizeof(notValid));
+    }else if (sa->gameList->count(args.front())) {
         write(sa->socket, notValid, sizeof(notValid));
     } else {
         write(sa->socket, valid, sizeof(valid));
@@ -30,7 +31,19 @@ void StartCommand::execute(vector<string> args, StructArgs *sa) {
         while (sa->gameList->count(sa->gameName)) {
             //wait for the game to be in active games
         }
-            cout << "start playing" << endl;
+        cout << "start playing" << endl;
     }
 
+}
+
+bool StartCommand::isExist(string name, StructArgs *sa) {
+    bool nameExist = false;
+    for (vector<ActiveGames>::const_iterator it = sa->activeGameVec->begin();
+            it != sa->activeGameVec->end(); it++) {
+        if (name.compare(it->name) == 0) {
+            nameExist = true;
+            break;
+        }
+    }
+    return nameExist;
 }

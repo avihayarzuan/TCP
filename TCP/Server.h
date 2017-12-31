@@ -6,7 +6,6 @@
 
 //#include "CommandManager.h"
 #include "ClientHandler.h"
-//#include "InfoHeader.h"
 #include <map>
 #include <pthread.h>
 #include <sys/socket.h>
@@ -43,6 +42,8 @@ class Server {
      * start communicate with the players.
      */
     void handleClients();
+
+    void closeServer();
 //private:
     // the port number for the server
     int port;
@@ -53,6 +54,8 @@ class Server {
 
     map<string, int> openGameList;
     vector <ActiveGames> activeGameVec;
+    vector <pthread_t> threadList;
+
 
 
     ClientHandler *clientHandler;

@@ -49,11 +49,11 @@ void * ClientHandler::handle(void *s) {
     client.activeGameVec = ta->activeGameVec;
     client.socket = ta->socket;
     client.connected = true;
-    while (client.connected) {
+    while (client.connected && !*ta->shouldClose) {
         int stat;
         char buf[MOVE_SIZE] = { 0 };
         stat = read(client.socket, buf, sizeof(char) * (MOVE_SIZE));
-        if (stat < 0) {
+        if (stat < 0 || buf[0] == '\0') {
             cout << "Disconnecting from server" << endl;
             break;
         }

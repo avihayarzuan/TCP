@@ -11,6 +11,7 @@ CommandManager::CommandManager() {
     commandsMap["start"] = new StartCommand;
     commandsMap["join"] = new JoinCommand;
     commandsMap["play"] = new PlayCommand;
+    commandsMap["close"] = new CloseCommand;
 }
 
 CommandManager::~CommandManager() {

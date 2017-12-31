@@ -22,6 +22,7 @@ using namespace std;
 class StartCommand : public Command {
  public:
     void execute(vector<string> args, StructArgs *sa);
+    bool isExist(string name, StructArgs *sa);
 };
 
 #endif /* TCP_STARTCOMMAND_H_ */

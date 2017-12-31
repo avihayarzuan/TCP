@@ -61,7 +61,12 @@ void Server::start() {
         cout << "Error: unable to create thread, " << rc << endl;
         exit(-1);
     }
+    while (!this->shouldExit) {
+
+    }
+//    this->closeServer();
     pthread_exit(NULL);
+    delete this->clientHandler;
 }
 
 
@@ -90,17 +95,26 @@ void * mainThread(void *s) {
         args.activeGameVec = &server->activeGameVec;
         args.manager = &manager;
         args.socket = clientSocket;
+        args.shouldClose = &server->shouldExit;
         int rc = pthread_create(&handleThread, NULL, server->clientHandler->handle, &args);
+        server->threadList.push_back(handleThread);
         if (rc) {
             cout << "Error: unable to create thread, " << rc << endl;
             exit(-1);
         }
     }
+
 //        pthread_exit(NULL);
     return s;
 }
 
-
+void Server::closeServer() {
+    for (vector<pthread_t>::iterator i = threadList.begin(); i != threadList.end();
+                ++i) {
+        pthread_cancel(*i);
+        pthread_join(*i, NULL);
+    }
+}
 
 void Server::handleClients() {
 // Start listening to incoming connections
