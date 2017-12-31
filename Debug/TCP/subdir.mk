@@ -4,21 +4,33 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../TCP/ClientHandler.cpp \
+../TCP/CloseCommand.cpp \
 ../TCP/CommandManager.cpp \
+../TCP/JoinCommand.cpp \
+../TCP/PlayCommand.cpp \
 ../TCP/ReadPort.cpp \
 ../TCP/Server.cpp \
 ../TCP/StartCommand.cpp \
 ../TCP/main.cpp 
 
 OBJS += \
+./TCP/ClientHandler.o \
+./TCP/CloseCommand.o \
 ./TCP/CommandManager.o \
+./TCP/JoinCommand.o \
+./TCP/PlayCommand.o \
 ./TCP/ReadPort.o \
 ./TCP/Server.o \
 ./TCP/StartCommand.o \
 ./TCP/main.o 
 
 CPP_DEPS += \
+./TCP/ClientHandler.d \
+./TCP/CloseCommand.d \
 ./TCP/CommandManager.d \
+./TCP/JoinCommand.d \
+./TCP/PlayCommand.d \
 ./TCP/ReadPort.d \
 ./TCP/Server.d \
 ./TCP/StartCommand.d \

@@ -4,7 +4,9 @@
 #ifndef TCPSERVER_SERVER_H
 #define TCPSERVER_SERVER_H
 
-#include "CommandManager.h"
+//#include "CommandManager.h"
+#include "ClientHandler.h"
+//#include "InfoHeader.h"
 #include <map>
 #include <pthread.h>
 #include <sys/socket.h>
@@ -19,13 +21,8 @@
 using namespace std;
 
 
-//struct ThreadArgs {
-//    Server *server;
-//    int socket;
-//};
-
 class Server {
-public:
+ public:
     /**
      * constructor for the server class
      * @param port the port number to run the server
@@ -54,15 +51,12 @@ public:
 
     bool shouldExit;
 
-    map <string, int> gameList;
+    map<string, int> openGameList;
+    vector <ActiveGames> activeGameVec;
 
-    CommandManager manager;
 
-    string getCommand(char buf[]);
+    ClientHandler *clientHandler;
 
-    vector<string> getCommandArgs(char buf[]);
-
-    int askForCommand(int client);
     /**
      * using two different socket the server starts the game
      * @param clientSocketFirst

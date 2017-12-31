@@ -5,25 +5,21 @@
  *      Author: avihay
  */
 
-#include <map>
-#include "Command.h"
-#include "StartCommand.h"
-//#include "Server.h"
-//#include "InfoHeader.h"
+
 
 using namespace std;
 
 #ifndef TCP_COMMANDMANAGER_H_
 #define TCP_COMMANDMANAGER_H_
+#include "StartCommand.h"
+#include "JoinCommand.h"
+#include "PlayCommand.h"
 
-/*
- *
- */
 class CommandManager {
  public:
     CommandManager();
     ~CommandManager();
-    void executeCommand(string command, vector<string> args);
+    void executeCommand(string command, vector<string> args, StructArgs *sa);
  private:
     map<string, Command *> commandsMap;
 };

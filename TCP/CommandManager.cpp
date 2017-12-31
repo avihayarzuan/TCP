@@ -9,6 +9,8 @@
 
 CommandManager::CommandManager() {
     commandsMap["start"] = new StartCommand;
+    commandsMap["join"] = new JoinCommand;
+    commandsMap["play"] = new PlayCommand;
 }
 
 CommandManager::~CommandManager() {
@@ -18,8 +20,9 @@ CommandManager::~CommandManager() {
     }
 }
 
-void CommandManager::executeCommand(string command, vector<string> args) {
+void CommandManager::executeCommand(string command, vector<string> args,
+                                    StructArgs *sa) {
     Command *commandObj = commandsMap[command];
-    commandObj->execute(args);
+    commandObj->execute(args, sa);
 }
 
