@@ -1,9 +1,8 @@
 /*
- * StartCommand.cpp
- *
- *  Created on: Dec 27, 2017
- *      Author: avihay
+ * Kfir Ventura
+ * Avihay Arzuan
  */
+
 #include "StartCommand.h"
 
 void StartCommand::execute(vector<string> args, StructArgs *sa) {
@@ -21,13 +20,13 @@ void StartCommand::execute(vector<string> args, StructArgs *sa) {
         write(sa->socket, notValid, sizeof(notValid));
     } else {
         write(sa->socket, valid, sizeof(valid));
+        pthread_mutex_lock(&m1);
         sa->gameList->insert(pair<string, int>(args.front(), sa->socket));
+        pthread_mutex_unlock(&m1);
         sa->gameName = args.front();
-        int stat;
         // reads 1 means verification by client
-        stat = read(sa->socket, buf, sizeof(char) * (MAX_SIZE));
-//        bool otherClient;
-//        while (!isExist(args.front(), sa)) {
+        read(sa->socket, buf, sizeof(char) * (MAX_SIZE));
+
         while (sa->gameList->count(sa->gameName)) {
             //wait for the game to be in active games
         }

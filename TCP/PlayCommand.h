@@ -1,8 +1,6 @@
 /*
- * PlayCommand.h
- *
- *  Created on: Dec 31, 2017
- *      Author: avihay
+ * Kfir Ventura
+ * Avihay Arzuan
  */
 
 #ifndef TCP_PLAYCOMMAND_H_
@@ -15,6 +13,12 @@
  */
 class PlayCommand : public Command {
  public:
+    /**
+     * given command 'play' and argument of the move to play
+     * send to opponent socket the move.
+     * @param args the x y move
+     * @param sa StructArgs of client.
+     */
     void execute(vector<string> args, StructArgs *sa);
 };
 

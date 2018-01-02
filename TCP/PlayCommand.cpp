@@ -1,8 +1,6 @@
 /*
- * PlayCommand.cpp
- *
- *  Created on: Dec 31, 2017
- *      Author: avihay
+ * Kfir Ventura
+ * Avihay Arzuan
  */
 
 #include "PlayCommand.h"

@@ -1,8 +1,6 @@
 /*
- * CommandManager.cpp
- *
- *  Created on: Dec 26, 2017
- *      Author: avihay
+ * Kfir Ventura
+ * Avihay Arzuan
  */
 
 #include "CommandManager.h"
@@ -12,6 +10,7 @@ CommandManager::CommandManager() {
     commandsMap["join"] = new JoinCommand;
     commandsMap["play"] = new PlayCommand;
     commandsMap["close"] = new CloseCommand;
+    commandsMap["list_games"] = new GetListCommand;
 }
 
 CommandManager::~CommandManager() {
@@ -26,4 +25,3 @@ void CommandManager::executeCommand(string command, vector<string> args,
     Command *commandObj = commandsMap[command];
     commandObj->execute(args, sa);
 }
-

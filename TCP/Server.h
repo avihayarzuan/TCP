@@ -1,24 +1,12 @@
-/**
- **/
+/*
+ * Kfir Ventura
+ * Avihay Arzuan
+ */
 
 #ifndef TCPSERVER_SERVER_H
 #define TCPSERVER_SERVER_H
 
-//#include "CommandManager.h"
 #include "ClientHandler.h"
-#include <map>
-#include <pthread.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <string.h>
-#include <cstring>
-#include <iostream>
-#include <cstdlib>
-#include <vector>
-
-using namespace std;
-
 
 class Server {
  public:
@@ -41,52 +29,24 @@ class Server {
      *using the socket the sever starts to listen and then
      * start communicate with the players.
      */
-    void handleClients();
 
-    void closeServer();
-//private:
-    // the port number for the server
     int port;
-    // the socket's file descriptor
+
     int serverSocket;
 
     bool shouldExit;
 
+    //list of available games
     map<string, int> openGameList;
+
+    // active game vector
     vector <ActiveGames> activeGameVec;
+
+    //thread list to close when server is closed
     vector <pthread_t> threadList;
-
-
 
     ClientHandler *clientHandler;
 
-    /**
-     * using two different socket the server starts the game
-     * @param clientSocketFirst
-     * @param clientSocketSecond
-     */
-    void play(int clientSocketFirst, int clientSocketSecond);
-    /**
-     * the function responsible for the game flow
-     * @param clientSocketFirst the starting player
-     * @param clientSocketSecond the second player
-     * @return
-     */
-    int playOneTurn(int clientSocketFirst, int clientSocketSecond);
-    /**
-     * when starting the game the function send to the socket the
-     * player color for the game
-     * @param clientSocket
-     * @param color
-     * @return the status of sending the message
-     */
-    int sendColor(int clientSocket, char color);
-    /**
-     * check if there is an error, depends the return value.
-     * @param stat
-     * @return true if there is an error, false otherwise
-     */
-    bool hasError(int stat);
 
 };
 

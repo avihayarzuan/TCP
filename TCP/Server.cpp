@@ -1,5 +1,8 @@
-/**
- **/
+/*
+ * Kfir Ventura
+ * Avihay Arzuan
+ */
+
 #include "Server.h"
 
 #define MAX_CONNECTED_CLIENTS 10
@@ -11,24 +14,13 @@
 #define END_GAME "End"
 #define SERVER_EXIT "exit"
 
-//pthread_mutex_t m1;
 
 void * mainThread(void *s);
-void * listenToExit(void*s);
-
-//
-//struct ThreadArgs {
-//    Server *server;
-//    map <string, int> * gameList;
-//    CommandManager * manager;
-//    int socket;
-//};
 
 Server::Server(const int port)
         : port(port),
           serverSocket(0),
           shouldExit(false) {
-
     this->clientHandler = new ClientHandler();
     cout << "Server" << endl;
 }
@@ -49,12 +41,6 @@ void Server::start() {
              sizeof(serverAddress)) == -1) {
         throw "Error on binding";
     }
-//    pthread_t exitLoop;
-//    int rc1 = pthread_create(&exitLoop, NULL, listenToExit, this);
-//    if (rc1) {
-//        cout << "Error: unable to create thread, " << rc1 << endl;
-//        exit(-1);
-//    }
     pthread_t maint;
     int rc = pthread_create(&maint, NULL, mainThread, this);
     if (rc) {
@@ -75,8 +61,6 @@ void Server::start() {
         }
     }
     this->stop();
-//    this->closeServer();
-//    pthread_exit(NULL);
     delete this->clientHandler;
 }
 
@@ -113,17 +97,7 @@ void * mainThread(void *s) {
             exit(-1);
         }
     }
-
-//        pthread_exit(NULL);
     return s;
-}
-
-void Server::closeServer() {
-    for (vector<pthread_t>::iterator i = threadList.begin();
-            i != threadList.end(); ++i) {
-        pthread_cancel(*i);
-        pthread_join(*i, NULL);
-    }
 }
 
 void Server::stop() {
@@ -133,21 +107,4 @@ void Server::stop() {
     }
     close(serverSocket);
     cout << "server stopped" << endl;
-}
-
-void * listenToExit(void *s) {
-    Server * server = (Server *) s;
-    while (true) {
-        cout << "Type 'exit' to turn off the server" << endl;
-        string input = "";
-        string exitStr("exit");
-        getline(cin, input);
-        cout << input << endl;
-        if (input.compare(exitStr) == 0) {
-            cout << "Shutting down server" << endl;
-            server->shouldExit = true;
-            break;
-        }
-    }
-    return s;
 }

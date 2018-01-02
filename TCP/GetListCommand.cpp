@@ -1,21 +1,19 @@
 /*
- * GetListCommand.cpp
- *
- *  Created on: Jan 1, 2018
- *      Author: kfir
+ * Kfir Ventura
+ * Avihay Arzuan
  */
 
 #include "GetListCommand.h"
 
 void GetListCommand::execute(vector<string> args, StructArgs *sa) {
-	int oppSocket = 0;
+	int socket =  sa->socket;
 	string roomList = "Active rooms:\n";
 	bool noActiveRooms = false;
 
-	if(sa->activeGameVec->size()) {
-		for (vector<ActiveGames>::const_iterator it = sa->activeGameVec->begin();
-					it != sa->activeGameVec->end(); it++) {
-				roomList += it->name;
+	if(sa->gameList->size()) {
+		for (map<string, int>::const_iterator it = sa->gameList->begin();
+					it != sa->gameList->end(); it++) {
+				roomList += it->first;
 				roomList += "\n";
 			}
 	} else {
@@ -25,11 +23,11 @@ void GetListCommand::execute(vector<string> args, StructArgs *sa) {
 	char buf[MAX_SIZE] = { 0 };
 
 	if(noActiveRooms) {
-		strcpy(buf, "There are no active rooms at the moment...\n");
+		strcpy(buf, "There are no available rooms at the moment...\n");
 	} else {
 		strcpy(buf, roomList.c_str());
 	}
 
-	write(oppSocket, buf, sizeof(char) * (MAX_SIZE));
+	write(socket, buf, sizeof(char) * (MAX_SIZE));
 
 }

@@ -1,8 +1,6 @@
 /*
- * CloseCommand.cpp
- *
- *  Created on: Dec 31, 2017
- *      Author: avihay
+ * Kfir Ventura
+ * Avihay Arzuan
  */
 
 #include "CloseCommand.h"
@@ -17,4 +15,3 @@ void CloseCommand::execute(vector<string> args, StructArgs *sa) {
     }
     sa->connected = false;
 }
-

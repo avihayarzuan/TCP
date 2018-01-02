@@ -1,8 +1,6 @@
 /*
- * ReadPort.h
- *
- *  Created on: Dec 10, 2017
- *      Author: avihay
+ * Kfir Ventura
+ * Avihay Arzuan
  */
 
 #ifndef TCP_READPORT_H_

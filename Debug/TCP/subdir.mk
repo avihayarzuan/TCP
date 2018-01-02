@@ -7,6 +7,7 @@ CPP_SRCS += \
 ../TCP/ClientHandler.cpp \
 ../TCP/CloseCommand.cpp \
 ../TCP/CommandManager.cpp \
+../TCP/GetListCommand.cpp \
 ../TCP/JoinCommand.cpp \
 ../TCP/PlayCommand.cpp \
 ../TCP/ReadPort.cpp \
@@ -18,6 +19,7 @@ OBJS += \
 ./TCP/ClientHandler.o \
 ./TCP/CloseCommand.o \
 ./TCP/CommandManager.o \
+./TCP/GetListCommand.o \
 ./TCP/JoinCommand.o \
 ./TCP/PlayCommand.o \
 ./TCP/ReadPort.o \
@@ -29,6 +31,7 @@ CPP_DEPS += \
 ./TCP/ClientHandler.d \
 ./TCP/CloseCommand.d \
 ./TCP/CommandManager.d \
+./TCP/GetListCommand.d \
 ./TCP/JoinCommand.d \
 ./TCP/PlayCommand.d \
 ./TCP/ReadPort.d \

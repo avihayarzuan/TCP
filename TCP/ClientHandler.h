@@ -1,59 +1,52 @@
 /*
- * ClientHandler.h
- *
- *  Created on: Dec 28, 2017
- *      Author: avihay
+ * Kfir Ventura
+ * Avihay Arzuan
  */
 
 #ifndef TCP_CLIENTHANDLER_H_
 #define TCP_CLIENTHANDLER_H_
 
-using namespace std;
-
-//#include "InfoHeader.h"
 #include "CommandManager.h"
 #include <vector>
 #include <string>
 
-
-//struct ActiveGames {
-//    string name;
-//    int blackPlayer;
-//    int whitePlayer;
-//};
-
 struct ThreadArgs {
     map<string, int> * openGameList;
-    vector <ActiveGames> * activeGameVec;
+    vector<ActiveGames> * activeGameVec;
     CommandManager * manager;
     bool * shouldClose;
     int socket;
 };
 
-//struct StructArgs;
-////struct ThreadArgs;
-//class Server;
-//class CommandManager;
-/*
- *
- */
 class ClientHandler {
  public:
     ClientHandler();
 
-    static void * handle(void *s);
-
-    static int firstContact(ThreadArgs *sa);
-
-    static void play(int socket1, int socket2);
-
-    bool hasError(int stat);
-
-    static string getCommandFromBuf(char buf[]);
-
-    static vector<string> getCommandArgsFromBuf(char buf[]);
-
     virtual ~ClientHandler();
+    /**
+     * the function is static, should get a pointer to ThreadArgs struct
+     * reads commands in loop from user and acts accordingly
+     * @param s pointer to TreadArgs struct
+     */
+    static void * handle(void *s);
+    /**
+     * checks if the stat param means error
+     * @param stat int to check value of.
+     * @return true if has error, false otherwise
+     */
+    bool hasError(int stat);
+    /**
+     * get char array and parse the command from it
+     * @param buf message from user
+     * @return string of the command
+     */
+    static string getCommandFromBuf(char buf[]);
+    /**
+     * read from char array arguments and keep it in vector of strings
+     * @param buf message from user
+     * @return vector of the arguments
+     */
+    static vector<string> getCommandArgsFromBuf(char buf[]);
 };
 
 #endif /* TCP_CLIENTHANDLER_H_ */

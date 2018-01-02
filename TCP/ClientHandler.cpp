@@ -1,8 +1,6 @@
 /*
- * ClientHandler.cpp
- *
- *  Created on: Dec 28, 2017
- *      Author: avihay
+ * Kfir Ventura
+ * Avihay Arzuan
  */
 
 #include "ClientHandler.h"
@@ -13,33 +11,10 @@
 #define NO_CONNECTION 0
 
 ClientHandler::ClientHandler() {
-    // TODO Auto-generated constructor stub
-
 }
 
 ClientHandler::~ClientHandler() {
-    // TODO Auto-generated destructor stub
 }
-
-int ClientHandler::firstContact(ThreadArgs *ta) {
-    StructArgs sa;
-    StructArgs *p = &sa;
-    sa.gameList = ta->openGameList;
-    sa.socket = ta->socket;
-    char buf[MOVE_SIZE] = { 0 };
-    int stat;
-    stat = read(sa.socket, buf, sizeof(char) * (MOVE_SIZE));
-    string command = ClientHandler::getCommandFromBuf(buf);
-    vector<string> v = ClientHandler::getCommandArgsFromBuf(buf);
-    CommandManager *manager = ta->manager;
-    manager->executeCommand(command, v, p);
-    return stat;
-}
-
-//    int stat;
-//    bool clientConnected = true;
-//    client.gameName = NULL;
-//    stat = ClientHandler::firstContact(ta);
 
 void * ClientHandler::handle(void *s) {
     ThreadArgs * ta = (ThreadArgs*) s;
@@ -49,6 +24,7 @@ void * ClientHandler::handle(void *s) {
     client.activeGameVec = ta->activeGameVec;
     client.socket = ta->socket;
     client.connected = true;
+    //loop that reads from user sockets, runs as a thread.
     while (client.connected && !*ta->shouldClose) {
         int stat;
         char buf[MOVE_SIZE] = { 0 };
@@ -84,7 +60,6 @@ string ClientHandler::getCommandFromBuf(char buf[]) {
 vector<string> ClientHandler::getCommandArgsFromBuf(char buf[]) {
     string str(buf);
     vector<string> v;
-//    string args;
     int i;
     for (i = 0; i < MESSAGE_SIZE; i++) {
         if (buf[i] == ' ') {

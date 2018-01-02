@@ -1,12 +1,10 @@
 /*
- * JoinCommand.cpp
- *
- *  Created on: Dec 29, 2017
- *      Author: avihay
+ * Kfir Ventura
+ * Avihay Arzuan
  */
 
 #include "JoinCommand.h"
-pthread_mutex_t active_mutex;
+
 
 void JoinCommand::execute(vector<string> args, StructArgs *sa) {
     char buf[MAX_SIZE] = { 0 };
@@ -25,17 +23,15 @@ void JoinCommand::execute(vector<string> args, StructArgs *sa) {
         ag.name = args.front();
         ag.blackPlayer = firstPlayerSocket;
         ag.whitePlayer = sa->socket;
-        pthread_mutex_lock(&active_mutex);
+        pthread_mutex_lock(&m1);
         sa->activeGameVec->push_back(ag);
-        pthread_mutex_unlock(&active_mutex);
+        pthread_mutex_unlock(&m1);
         sa->gameList->erase(args.front());
         //read value 1 from second client
         read(sa->socket, buf, sizeof(char) * (MAX_SIZE));
         sendColor(firstPlayerSocket, BLACK);
         sendColor(sa->socket, WHITE);
         sa->gameName = ag.name;
-//        sa->playing = true;
-//        sa->oppSocket = firstPlayerSocket;
     } else {
         write(sa->socket, notValid, sizeof(notValid));
     }
