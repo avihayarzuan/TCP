@@ -7,6 +7,7 @@
 #define TCPSERVER_SERVER_H
 
 #include "ClientHandler.h"
+#include "ThreadPool.h"
 
 class Server {
  public:
@@ -46,6 +47,10 @@ class Server {
     vector <pthread_t> threadList;
 
     ClientHandler *clientHandler;
+
+//    CommandManager cm;
+
+
 
 
 };

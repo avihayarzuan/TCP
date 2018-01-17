@@ -13,6 +13,7 @@ CPP_SRCS += \
 ../TCP/ReadPort.cpp \
 ../TCP/Server.cpp \
 ../TCP/StartCommand.cpp \
+../TCP/ThreadPool.cpp \
 ../TCP/main.cpp 
 
 OBJS += \
@@ -25,6 +26,7 @@ OBJS += \
 ./TCP/ReadPort.o \
 ./TCP/Server.o \
 ./TCP/StartCommand.o \
+./TCP/ThreadPool.o \
 ./TCP/main.o 
 
 CPP_DEPS += \
@@ -37,6 +39,7 @@ CPP_DEPS += \
 ./TCP/ReadPort.d \
 ./TCP/Server.d \
 ./TCP/StartCommand.d \
+./TCP/ThreadPool.d \
 ./TCP/main.d 
 
 

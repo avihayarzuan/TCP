@@ -35,6 +35,7 @@ struct ActiveGames {
     int whitePlayer;
 };
 
+
 struct StructArgs {
     map<string, int> * gameList;
     vector<ActiveGames> * activeGameVec;

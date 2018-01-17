@@ -4,6 +4,7 @@
  */
 
 #include "Server.h"
+//#include "HandleClientTask.h"
 
 #define MAX_CONNECTED_CLIENTS 10
 #define MOVE_SIZE 256
@@ -14,8 +15,18 @@
 #define END_GAME "End"
 #define SERVER_EXIT "exit"
 
+#define THREAD_NUM 5
+#define TASKS_NUM 10
 
+void* sendToClientHandler(void *taskId);
 void * mainThread(void *s);
+
+struct StructTask {
+    Server *s;
+    int socket;
+//    pthread_t t;
+    CommandManager *m;
+};
 
 Server::Server(const int port)
         : port(port),
@@ -41,6 +52,7 @@ void Server::start() {
              sizeof(serverAddress)) == -1) {
         throw "Error on binding";
     }
+
     pthread_t maint;
     int rc = pthread_create(&maint, NULL, mainThread, this);
     if (rc) {
@@ -66,6 +78,9 @@ void Server::start() {
 
 void * mainThread(void *s) {
     CommandManager manager;
+    //creates a Thread pool of size 5:
+    ThreadPool pool(THREAD_NUM);
+    vector<Task*> v;
     int count = 0;
     cout << "Server thread created" << endl;
     Server *server = (Server*) s;
@@ -82,25 +97,40 @@ void * mainThread(void *s) {
             throw "Error on accept client";
         }
         cout << "Client connected. number: " << count << endl;
-        pthread_t handleThread;
-        ThreadArgs args;
-        args.openGameList = &server->openGameList;
-        args.activeGameVec = &server->activeGameVec;
-        args.manager = &manager;
-        args.socket = clientSocket;
-        args.shouldClose = &server->shouldExit;
-        int rc = pthread_create(&handleThread, NULL,
-                                server->clientHandler->handle, &args);
-        server->threadList.push_back(handleThread);
-        if (rc) {
-            cout << "Error: unable to create thread, " << rc << endl;
-            exit(-1);
-        }
+        StructTask st;
+        st.s = server;
+        st.socket = clientSocket;
+        st.m = &manager;
+        Task *task = new Task(sendToClientHandler, (void *) &st);
+        v.push_back(task);
+        pool.addTask(task);
+
+    }
+    pool.terminate();
+    for (vector<Task*>::iterator i = v.begin();
+            i != v.end(); ++i) {
+        delete(*i);
     }
     return s;
 }
 
+// the task to run run by the ThreadPool
+void* sendToClientHandler(void *taskId) {
+    StructTask * ta = (StructTask*) taskId;
+
+    ThreadArgs args;
+    args.openGameList = &ta->s->openGameList;
+
+    args.activeGameVec = &ta->s->activeGameVec;
+    args.manager = ta->m;
+    args.socket = ta->socket;
+    args.shouldClose = &ta->s->shouldExit;
+    ta->s->clientHandler->handle((void *) &args);
+    return taskId;
+}
+
 void Server::stop() {
+
     for (vector<pthread_t>::iterator i = threadList.begin();
             i != threadList.end(); ++i) {
         pthread_cancel(*i);
